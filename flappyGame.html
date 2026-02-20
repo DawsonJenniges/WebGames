@@ -2,24 +2,26 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Flappy JS</title>
-    <style>
-        body {
-            margin: 0;
-            background: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        canvas {
-            background: #70c5ce;
-        }
-    </style>
+    <link rel="stylesheet" href="flappyStyles.css">
 </head>
 <body>
-    <canvas id="flappyGame" width="275" height="500"></canvas>
-    <a href="index.html">Back to Menu</a>
+    <header>
+        <h1>Flappy Bird</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="gameCard">
+        <h2 id="highScoreDisplay"></h2>
+        <canvas id="flappyGame" width="288" height="500"></canvas>
+        <p id="instructions">Press SPACE or tap/click to fly</p>
+    </div>
+
     <script src="flappyGame.js"></script>
+    
 </body>
 </html>

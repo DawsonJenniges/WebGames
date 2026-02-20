@@ -15,8 +15,11 @@ const birdFrames = [
     loadImage("Images/bird3.png")
 ];
 
-const canvas = document.getElementById("game");
+const canvas = document.getElementById("flappyGame");
 const ctx = canvas.getContext("2d");
+
+const highScoreDisplay = document.getElementById("highScoreDisplay");
+const instructionsEl = document.getElementById("instructions");
 
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
@@ -34,6 +37,7 @@ let gameOver = false;
 let flying = false;
 let enteringName = false;
 let playerName = "";
+let started = false;
 
 let lastPipeTime = 0;
 let pipes = [];
@@ -55,7 +59,16 @@ function saveRecord(name, score) {
     localStorage.setItem("flappyRecord", JSON.stringify({ name, score }));
 }
 
+function drawGameOver(){
+    ctx.drawImage(gameOverImg, 24, 80, 200, 100);
+}
+
+function updateHighScoreDisplay() {
+    highScoreDisplay.textContent = `High Score: ${record.name} - ${record.score}`;
+}
+
 let record = loadRecord();
+updateHighScoreDisplay();
 
 class Bird {
     constructor() {
@@ -69,6 +82,8 @@ class Bird {
     }
 
     update() {
+        if(!started) return;
+
         if (!gameOver && flying) {
             this.vel += GRAVITY;
             this.y += this.vel;
@@ -80,14 +95,14 @@ class Bird {
             this.frameIndex = (this.frameIndex + 1) % birdFrames.length;
             this.frameCounter = 0;
         }
-
-        if (this.y + this.height > GROUND_Y) {
-            this.y = GROUND_Y - this.height;
-            gameOver = true;
-        }
     }
 
     draw() {
+        if(!started) {
+            drawText("SPACE or CLICK to Start", 18, 50, HEIGHT / 2);
+            return;
+        }
+
         ctx.save();
 
         // rotate based on velocity
@@ -140,16 +155,19 @@ class Pipe {
     }
 
     draw() {
-        // TOP PIPE
+        // TOP PIPE (flipped upside down)
+        ctx.save();
+        ctx.scale(1, -1);
         ctx.drawImage(
             pipeImg,
             this.x,
-            0,
+            -this.topHeight,   // negative because canvas is flipped
             this.width,
             this.topHeight
         );
+        ctx.restore();
 
-        // BOTTOM PIPE
+        // BOTTOM PIPE (normal)
         ctx.drawImage(
             pipeImg,
             this.x,
@@ -158,6 +176,7 @@ class Pipe {
             GROUND_Y - this.bottomY
         );
     }
+
 
     getTopRect() {
         return {
@@ -203,6 +222,13 @@ function collide(rect1, rect2) {
 function checkCollisions() {
     const birdBox = bird.getHitbox();
 
+    // ---- GROUND COLLISION ----
+    if (bird.y + bird.height >= GROUND_Y) {
+        gameOver = true;
+        return;
+    }
+
+    // ---- PIPE COLLISIONS ----
     for (let pipe of pipes) {
         if (
             collide(birdBox, pipe.getTopRect()) ||
@@ -218,6 +244,7 @@ function checkCollisions() {
     }
 }
 
+
 function drawText(text, size, x, y, color = "white") {
     ctx.fillStyle = color;
     ctx.font = `${size}px Arial`;
@@ -226,13 +253,13 @@ function drawText(text, size, x, y, color = "white") {
 
 function drawRestartButton() {
     const btn = {
-        x: WIDTH / 2 - 60,
-        y: HEIGHT / 2 + 60,
+        x: WIDTH / 2 - 53,
+        y: HEIGHT / 2 - 20,
         width: 120,
         height: 40
     };
 
-    ctx.fillStyle = "gray";
+    ctx.fillStyle = "white";
     ctx.fillRect(btn.x, btn.y, btn.width, btn.height);
 
     drawText("Restart", 16, btn.x + 30, btn.y + 25, "black");
@@ -245,10 +272,12 @@ function resetGame() {
     score = 0;
     gameOver = false;
     flying = false;
+    started = false;
     enteringName = false;
     bird.y = HEIGHT / 2;
     bird.vel = 0;
 }
+
 
 canvas.addEventListener("click", (e) => {
     if (gameOver && !enteringName) {
@@ -261,38 +290,84 @@ document.addEventListener("keydown", (e) => {
         if (e.key === "Enter" && playerName.length > 0) {
             saveRecord(playerName, score);
             record = { name: playerName, score: score };
+            updateHighScoreDisplay();
             enteringName = false;
         } else if (e.key === "Backspace") {
             playerName = playerName.slice(0, -1);
         } else if (playerName.length < 10 && e.key.length === 1) {
             playerName += e.key;
         }
-    } else if (!gameOver) {
-        if (!flying) flying = true;
+    }
+    if(!started && e.code == "Space"){
+        started = true;
+        flying = true;
+        bird.jump();
+        return;
+    } 
+    else if (!gameOver) {
+        bird.jump();
+    }
+});
+
+canvas.addEventListener("mousedown", () => {
+    if (enteringName) return;
+
+    if (!started) {
+        started = true;
+        flying = true;
+        bird.jump();
+        return;
+    }
+
+    if (!gameOver) {
         bird.jump();
     }
 });
 
 function update(timestamp) {
-    if (!gameOver) {
+    // show/hide instructions area so it doesn't cover during play
+    if (instructionsEl) {
+        instructionsEl.style.display = started ? "none" : "block";
+    }
+
+    // ----- PIPES ONLY MOVE IF GAME NOT OVER -----
+    if (!gameOver && started) {
         spawnPipe(timestamp);
+
+        for (let pipe of pipes) {
+            pipe.update();
+        }
+
+        pipes = pipes.filter(p => p.x + p.width > 0);
     }
 
-    bird.update();
-
-    for (let pipe of pipes) {
-        pipe.update();
+    // ----- BIRD LOGIC -----
+    if (!gameOver) {
+        bird.update();
+    } 
+    else {
+        // Bird keeps falling after death until it hits ground
+        if (bird.y + bird.height < GROUND_Y) {
+            bird.vel += GRAVITY;
+            bird.y += bird.vel;
+        } else {
+            bird.y = GROUND_Y - bird.height;
+            bird.vel = 0;
+        }
     }
 
-    pipes = pipes.filter(p => p.x + p.width > 0);
+    // Only check collisions if still alive
+    if (!gameOver) {
+        checkCollisions();
+    }
 
-    checkCollisions();
-
+    // High score entry
     if (gameOver && score > record.score && !enteringName) {
         enteringName = true;
         playerName = "";
     }
 }
+
 
 function draw() {
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
@@ -307,7 +382,6 @@ function draw() {
     drawGround();
 
     drawText(score, 32, WIDTH / 2 - 10, 40);
-    drawText(`BEST: ${record.name} - ${record.score}`, 14, 10, 20, "black");
 
     if (gameOver) {
         if (enteringName) {
@@ -316,6 +390,7 @@ function draw() {
             drawText(playerName, 16, 100, 260);
         } else {
             drawText("Game Over", 24, 80, 200);
+            /* drawGameOver(); */
             drawRestartButton();
         }
     }
