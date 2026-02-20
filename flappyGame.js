@@ -32,6 +32,7 @@ const PIPE_SPEED = 3;
 const GROUND_Y = 400;
 const PIPE_INTERVAL = 1500;
 
+let lastTime = 0;
 let score = 0;
 let gameOver = false;
 let flying = false;
@@ -81,16 +82,14 @@ class Bird {
         this.frameCounter = 0;
     }
 
-    update() {
-        if(!started) return;
-
+    update(delta) {
         if (!gameOver && flying) {
-            this.vel += GRAVITY;
-            this.y += this.vel;
+            this.vel += GRAVITY * delta;
+            this.y += this.vel * delta;
         }
 
-        // animation
-        this.frameCounter++;
+        // animation (keep frame animation consistent)
+        this.frameCounter += delta;
         if (this.frameCounter > 5) {
             this.frameIndex = (this.frameIndex + 1) % birdFrames.length;
             this.frameCounter = 0;
@@ -150,8 +149,8 @@ class Pipe {
         this.passed = false;
     }
 
-    update() {
-        this.x -= PIPE_SPEED;
+    update(delta) {
+        this.x -= PIPE_SPEED * delta;
     }
 
     draw() {
@@ -203,8 +202,9 @@ class Pipe {
 const bird = new Bird();
 
 function spawnPipe(timestamp) {
+    if (!started) return;  // ← ADD THIS
+
     if (timestamp - lastPipeTime > PIPE_INTERVAL) {
-        const offset = Math.random() * 200 - 100;
         pipes.push(new Pipe());
         lastPipeTime = timestamp;
     }
@@ -298,9 +298,10 @@ document.addEventListener("keydown", (e) => {
             playerName += e.key;
         }
     }
-    if(!started && e.code == "Space"){
+    if (!started && e.code === "Space") {
         started = true;
         flying = true;
+        lastPipeTime = performance.now();  // ← ADD THIS
         bird.jump();
         return;
     } 
@@ -315,16 +316,17 @@ canvas.addEventListener("mousedown", () => {
     if (!started) {
         started = true;
         flying = true;
+        lastPipeTime = performance.now();  // ← ADD THIS
         bird.jump();
         return;
-    }
+    }   
 
     if (!gameOver) {
         bird.jump();
     }
 });
 
-function update(timestamp) {
+function update(delta, timestamp) {
     // show/hide instructions area so it doesn't cover during play
     if (instructionsEl) {
         instructionsEl.style.display = started ? "none" : "block";
@@ -335,7 +337,7 @@ function update(timestamp) {
         spawnPipe(timestamp);
 
         for (let pipe of pipes) {
-            pipe.update();
+            pipe.update(delta);
         }
 
         pipes = pipes.filter(p => p.x + p.width > 0);
@@ -343,13 +345,13 @@ function update(timestamp) {
 
     // ----- BIRD LOGIC -----
     if (!gameOver) {
-        bird.update();
+        bird.update(delta);
     } 
     else {
         // Bird keeps falling after death until it hits ground
         if (bird.y + bird.height < GROUND_Y) {
-            bird.vel += GRAVITY;
-            bird.y += bird.vel;
+            bird.vel += GRAVITY * delta;
+            bird.y += bird.vel * delta;
         } else {
             bird.y = GROUND_Y - bird.height;
             bird.vel = 0;
@@ -398,8 +400,16 @@ function draw() {
     
 
 function gameLoop(timestamp) {
-    update(timestamp);
+    if (!lastTime) lastTime = timestamp;
+
+    // normalize to 60fps baseline
+    const delta = (timestamp - lastTime) / 16.67;
+
+    lastTime = timestamp;
+
+    update(delta, timestamp);
     draw();
+
     requestAnimationFrame(gameLoop);
 }
 
