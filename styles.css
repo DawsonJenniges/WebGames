@@ -1,0 +1,16 @@
+.FlappyCard img{
+    width: 150px;
+    height: 250px;
+}
+
+.grid{
+    display: grid;
+    grid-template-columns: 50% 50%;
+    justify-content: center;
+}
+
+.grid div{
+    border: 1px solid black;
+    margin: 2px;
+    padding: 2px;
+}

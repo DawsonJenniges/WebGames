@@ -315,6 +315,15 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
+document.addEventListener("keydown", (e) => {
+    if (e.key === "p") { // press P to screenshot
+        const link = document.createElement("a");
+        link.download = "flappy-screenshot.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+    }
+});
+
 canvas.addEventListener("mousedown", () => {
     if (enteringName) return;
 
