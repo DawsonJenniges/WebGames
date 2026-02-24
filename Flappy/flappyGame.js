@@ -4,15 +4,15 @@ function loadImage(src){
     return img;
 }
 
-const bgImg = loadImage("/Images/background-night.png");
-const groundImg = loadImage("/Images/base.png");
-const pipeImg = loadImage("/Images/pipe-green.png");
-const gameOverImg = loadImage("/Images/gameover.png");
+const bgImg = loadImage("Images/background-night.png");
+const groundImg = loadImage("Images/base.png");
+const pipeImg = loadImage("Images/pipe-green.png");
+const gameOverImg = loadImage("Images/gameover.png");
 
 const birdFrames = [
-    loadImage("/Images/bird1.png"),
-    loadImage("/Images/bird2.png"),
-    loadImage("/Images/bird3.png")
+    loadImage("Images/bird1.png"),
+    loadImage("Images/bird2.png"),
+    loadImage("Images/bird3.png")
 ];
 
 const canvas = document.getElementById("flappyGame");
