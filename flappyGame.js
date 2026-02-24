@@ -31,6 +31,7 @@ const PIPE_WIDTH = 50;
 const PIPE_SPEED = 3;
 const GROUND_Y = 400;
 const PIPE_INTERVAL = 1500;
+const GROUND_SPEED = PIPE_SPEED;
 
 let lastTime = 0;
 let score = 0;
@@ -39,6 +40,7 @@ let flying = false;
 let enteringName = false;
 let playerName = "";
 let started = false;
+let groundX = 0;
 
 let lastPipeTime = 0;
 let pipes = [];
@@ -48,7 +50,10 @@ function drawBackground(){
 }
 
 function drawGround() {
-    ctx.drawImage(groundImg, 0, GROUND_Y, WIDTH, HEIGHT - GROUND_Y);
+    const groundHeight = HEIGHT - GROUND_Y;
+
+    ctx.drawImage(groundImg, groundX, GROUND_Y, WIDTH, groundHeight);
+    ctx.drawImage(groundImg, groundX + WIDTH, GROUND_Y, WIDTH, groundHeight);
 }
 
 function loadRecord() {
@@ -334,13 +339,20 @@ function update(delta, timestamp) {
 
     // ----- PIPES ONLY MOVE IF GAME NOT OVER -----
     if (!gameOver && started) {
+        //Pipe movement
         spawnPipe(timestamp);
-
         for (let pipe of pipes) {
             pipe.update(delta);
         }
-
         pipes = pipes.filter(p => p.x + p.width > 0);
+
+        // Ground movement
+        groundX -= GROUND_SPEED * delta;
+
+        // reset when fully off screen
+        if (groundX <= -WIDTH) {
+            groundX = 0;
+        }
     }
 
     // ----- BIRD LOGIC -----
