@@ -1,0 +1,99 @@
+/* overall page setup */
+body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+    color: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* fixed header/nav */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    z-index: 100;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+header nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+}
+
+header nav li + li {
+    margin-left: 15px;
+}
+
+header nav a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+/* game container styling */
+.gameCard {
+    margin-top: 50px; /* leave room for header */
+    background: #222;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+#highScoreDisplay {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+canvas {
+    background: grey;
+    border: 2px solid #000;
+    border-radius: 5px;
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    height: auto;
+}
+
+#instructions {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* adapt to small screens */
+@media (max-width: 500px) {
+    header h1 {
+        font-size: 1.2rem;
+    }
+    header nav a {
+        font-size: 0.9rem;
+    }
+    .gameCard {
+        padding: 10px;
+    }
+    #highScoreDisplay {
+        font-size: 1rem;
+    }
+    #instructions {
+        font-size: 0.8rem;
+    }
+}

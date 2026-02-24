@@ -258,7 +258,7 @@ function drawText(text, size, x, y, color = "white") {
 
 function drawRestartButton() {
     const btn = {
-        x: WIDTH / 2 - 53,
+        x: WIDTH / 2 - 52,
         y: HEIGHT / 2 - 20,
         width: 120,
         height: 40
