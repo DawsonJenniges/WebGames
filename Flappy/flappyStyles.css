@@ -2,8 +2,8 @@
 body {
     margin: 0;
     padding: 0;
-    background: #000;
-    color: #fff;
+    background: #061E29;
+    color: #F3F4F4;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
     flex-direction: column;
@@ -17,7 +17,7 @@ header {
     top: 0;
     left: 0;
     width: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: #03131a;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -43,7 +43,7 @@ header nav li + li {
 }
 
 header nav a {
-    color: #fff;
+    color: #F3F4F4;
     text-decoration: none;
     font-size: 1rem;
 }
@@ -51,7 +51,7 @@ header nav a {
 /* game container styling */
 .gameCard {
     margin-top: 50px; /* leave room for header */
-    background: #222;
+    background: #061E29;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);

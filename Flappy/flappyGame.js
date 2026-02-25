@@ -315,7 +315,8 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-document.addEventListener("keydown", (e) => {
+// screenshot function use p
+/* document.addEventListener("keydown", (e) => {
     if (e.key === "p") { // press P to screenshot
         const link = document.createElement("a");
         link.download = "flappy-screenshot.png";
@@ -323,7 +324,7 @@ document.addEventListener("keydown", (e) => {
         link.click();
     }
 });
-
+ */
 canvas.addEventListener("mousedown", () => {
     if (enteringName) return;
 
