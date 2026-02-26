@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Flappy JS</title>
+    <title>BlackJack</title>
     <link rel="stylesheet" href="blackjack.css">
 </head>
 <body>
@@ -11,17 +11,28 @@
         <h1>BlackJack</h1>
         <nav>
             <ul>
+                <li><a href="#" id="rulesLink">Rules</a></li>
                 <li><a href="../index.html">Home</a></li>
             </ul>
         </nav>
     </header>
     <div class="gameCard">
         <!-- <h2 id="highScoreDisplay"></h2> -->
-        <canvas id="blackjack" width="500" height="500"></canvas>
-        <p id="instructions">Press SPACE or tap/click to fly</p>
+        <canvas id="blackjackCanvas" width="500" height="500"></canvas>
+        <p id="instructions">N/A</p>
     </div>
 
     <script src="blackjack.js"></script>
-    
+    <div id="rulesPanel" class="rules-panel">
+        <button id="closeRules">X</button>
+        <h2>BlackJack Rules</h2>
+        <ul>
+            <li>Goal: Get as close to 21 as possible without going over (AKA busting).</li>
+            <li>Face cards (J, Q, K) and 10 are worth 10 points each.</li>
+            <li>Aces are worth 1 or 11 points (whichever is better for the hand).</li>
+            <li>Dealer hits until 17 or higher.</li>
+            <li>A blackjack (Ace + 10-value card) pays 3:2.</li>
+        </ul>
+    </div>
 </body>
 </html>

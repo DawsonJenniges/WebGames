@@ -79,6 +79,40 @@ canvas {
     opacity: 0.8;
 }
 
+/*rules things*/
+.rules-panel {
+    position: fixed;
+    top: 0;
+    right: -400px;   /* hidden off screen */
+    width: 350px;
+    height: 100%;
+    background: #061E29;
+    color: white;
+    padding: 20px;
+    box-shadow: -4px 0 10px rgba(0,0,0,0.5);
+    transition: right 0.3s ease;
+    z-index: 200;
+}
+
+.rules-panel.active {
+    right: 0;  /* slide into view */
+}
+
+.rules-panel h2 {
+    margin-top: 40px;
+}
+
+#closeRules {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
 /* adapt to small screens */
 @media (max-width: 500px) {
     header h1 {
