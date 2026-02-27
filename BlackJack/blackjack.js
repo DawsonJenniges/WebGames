@@ -200,6 +200,47 @@ function makeCardBack(x, y) {
     ctx.restore();
 }
 
+function drawButton(text, x, y, color) {
+    const width = 100;
+    const height = 40;
+    const radius = 12;
+
+    ctx.save();
+
+    // Shadow
+    ctx.shadowColor = "rgba(0,0,0,0.5)";
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetY = 4;
+
+    // Gradient
+    const gradient = ctx.createLinearGradient(x, y, x, y + height);
+    gradient.addColorStop(0, color);
+    gradient.addColorStop(1, "#000");
+
+    ctx.fillStyle = gradient;
+
+    // Rounded rectangle
+    roundRect(ctx, x, y, width, height, radius);
+    ctx.fill();
+
+    ctx.restore();
+
+    // Border
+    ctx.strokeStyle = "rgba(255,255,255,0.3)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Text
+    ctx.fillStyle = "white";
+    ctx.font = "bold 16px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, x + width / 2, y + height / 2);
+    
+    return{x, y, width, height};
+}
+
+
 // GAME LOGIC
 const suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
 const values = [
@@ -225,6 +266,8 @@ let state = "betting";
 let deck = []
 let playerHand = [];
 let dealerHand = [];
+let hitButton = null;
+let standButton = null;
 
 
 function shuffle(deck){
@@ -292,6 +335,14 @@ function drawHand(hand, centerX, y, downcard=false){
     }
 }
 
+function runDealerTurn() {
+    while (countHand(dealerHand) < 17) {
+        dealCard(dealerHand);
+    }
+
+    state = "roundOver";
+}
+
 //Temporary draw loop to see table
 function render(){
     drawTable(ctx, canvas.width, canvas.height);
@@ -304,6 +355,44 @@ function render(){
 
     requestAnimationFrame(render);
 }
+
+//hit and stand button handline
+canvas.addEventListener("click", (e) => {
+    if (state !== "playerTurn") return;
+
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    // HIT
+    if (
+        hitButton &&
+        mouseX >= hitButton.x &&
+        mouseX <= hitButton.x + hitButton.width &&
+        mouseY >= hitButton.y &&
+        mouseY <= hitButton.y + hitButton.height
+    ) {
+        dealCard(playerHand);
+
+        if (countHand(playerHand) > 21) {
+            state = "roundOver";
+        }
+
+        return;
+    }
+
+    // STAND
+    if (
+        standButton &&
+        mouseX >= standButton.x &&
+        mouseX <= standButton.x + standButton.width &&
+        mouseY >= standButton.y &&
+        mouseY <= standButton.y + standButton.height
+    ) {
+        state = "dealerTurn";
+        runDealerTurn();
+    }
+});
 
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -319,8 +408,14 @@ function gameLoop() {
     }
 
     if (state === "playerTurn") {
+        hitButton = drawButton("HIT", canvas.width / 2 - 105, canvas.height - 120, "#1b8f3a");
+        standButton = drawButton("STAND", canvas.width / 2 + 5, canvas.height - 120, "#d4af37");
         drawHand(dealerHand, canvas.width / 2, canvas.height / 4 - 25, true);
         drawHand(playerHand, canvas.width / 2, canvas.height / 2 + 20);
+    }
+    else{
+        hitButton = null;
+        standButton = null;
     }
 
     if (state === "dealerTurn") {
